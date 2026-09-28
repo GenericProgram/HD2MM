@@ -1,0 +1,6 @@
+customtkinter==6.0.0
+packaging==26.3
+darkdetect==0.8.0
+Pillow
+tkinterdnd2
+pyinstaller
