@@ -8,7 +8,7 @@ class ModManagerBackend:
     def __init__(self):
         self.game_dir = ""
         self.mods = []
-        self.mods_dir = "installed_mods"
+        self.mods_dir = "staging"
         if not os.path.exists(self.mods_dir):
             os.makedirs(self.mods_dir)
         self.load_config()
@@ -276,27 +276,16 @@ class ModManagerBackend:
         return files, conflicts
 
     def deploy_mods(self):
-        self.staging_dir = "staging"
-        if os.path.exists(self.staging_dir):
-            shutil.rmtree(self.staging_dir)
-        os.makedirs(self.staging_dir)
-        
         files, conflicts = self.get_active_files()
         
-        for dest, (src, _) in files.items():
-            staging_dest = os.path.join(self.staging_dir, dest)
-            os.makedirs(os.path.dirname(staging_dest), exist_ok=True)
-            shutil.copy2(src, staging_dest)
-            
         if self.game_dir:
             data_dir = os.path.join(self.game_dir, "data")
-            if os.path.exists(data_dir):
-                for root, _, filenames in os.walk(self.staging_dir):
-                    for filename in filenames:
-                        src = os.path.join(root, filename)
-                        rel_path = os.path.relpath(src, self.staging_dir)
-                        game_dest = os.path.join(data_dir, rel_path)
-                        os.makedirs(os.path.dirname(game_dest), exist_ok=True)
-                        shutil.copy2(src, game_dest)
-        
+            if not os.path.exists(data_dir):
+                os.makedirs(data_dir)
+                
+            for dest, (src, _) in files.items():
+                game_dest = os.path.join(data_dir, dest)
+                os.makedirs(os.path.dirname(game_dest), exist_ok=True)
+                shutil.copy2(src, game_dest)
+                
         return conflicts

@@ -5,3 +5,4 @@ config.json
 installed_mods/*
 build/*
 dist/*
+test_zips/*
